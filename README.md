@@ -115,33 +115,14 @@ rapidocr_onnxruntime>=1.3.0
 | --- | --- |
 | `/插件回复状态` | 查看当前群暂存数量、图片识别状态、视觉模型、防学习标注 |
 
-## 8. 当前限制
-
-- 只捕获走标准回复链的插件；直接调用底层发送的插件可能抓不到；
-- 图片识别依赖视觉模型，未配置时只记录占位符；
-- 暂存队列在内存中，重启后丢失；
-- 合并转发、文件、语音暂只记录占位符或忽略；
-- 图片是本地临时文件时，发送后可能已删除，识别会失败。
-
-## 9. 与 selflearning 兼容
-
-注入块默认带两层防学习标记：
-
-- 结构标记：`<plugin_reply_context no_learn="true" source="astrbot_plugin_reply_visible">…</plugin_reply_context>`；
-- 行为提示：明确要求模型不要复述、模仿，也不要写入长期记忆或学习语料。
-
-同时注入使用 `TextPart.mark_as_temp()`，不会写入 AstrBot 会话历史。若当前 AstrBot 版本不支持临时标记，插件会**跳过注入**，而不是退回到可能被持久化的 `system_prompt` 注入。
-
-需要说明：selflearning（NickCharlie 版）当前的学习链路只采集**用户入站消息**和 **Bot 出站消息**，不读取 `on_llm_request` 里的临时注入块，因此不会直接学习本插件注入的插件回复。它仍会把原始插件回复当作 Bot 出站消息记录；若希望完全禁止这类内容进入学习语料，需要在 selflearning 侧按群、插件或指令过滤，或关闭对应采集。`no_learn` 标记也可供后续支持该约定的学习插件识别。
-
-## 10. 兼容性
+## 8. 兼容性
 
 - AstrBot 4.29.x；
 - 使用公开钩子：`after_message_sent`、`on_llm_request`；
 - 不修改 AstrBot 核心；
 - 不修改其他插件。
 
-## 11. 目录结构
+## 9. 目录结构
 
 ```text
 astrbot_plugin_reply_visible/
@@ -157,6 +138,6 @@ astrbot_plugin_reply_visible/
     └── test_smoke.py
 ```
 
-## 12. 开源协议
+## 10. 开源协议
 
 本项目采用 [MIT License](LICENSE) 开源。你可以自由使用、修改和分发，但需保留原始版权声明和协议文本。

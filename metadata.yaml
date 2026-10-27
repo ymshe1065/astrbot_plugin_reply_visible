@@ -9,7 +9,7 @@ desc: |
 version: 0.1.0
 author: ymshe1065
 repo: https://github.com/ymshe1065/astrbot_plugin_reply_visible
-astrbot_version: ">=4.29.0,<5"
+astrbot_version: ">=4.29.0"
 support_platforms:
   - aiocqhttp
 tags:

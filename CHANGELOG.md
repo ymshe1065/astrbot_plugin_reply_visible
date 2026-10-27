@@ -22,7 +22,7 @@
 - 插件 ID：`ymshe1065/astrbot_plugin_reply_visible`；
 - 作者：`ymshe1065`；
 - 版本：`0.1.0`；
-- 兼容 AstrBot `>=4.29.0,<5`；
+- 兼容 AstrBot `>=4.29.0`；
 - 声明平台：`aiocqhttp`；
 - 开源协议：MIT。
 

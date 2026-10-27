@@ -1,12 +1,12 @@
 # AstrBot 插件回复可见（Plugin Reply Visible）
 
-[![AstrBot](https://img.shields.io/badge/AstrBot-%3E%3D4.29%2C%3C5-blue.svg)](https://github.com/AstrBotDevs/AstrBot)
+[![AstrBot](https://img.shields.io/badge/AstrBot-%3E%3D4.29.0-blue.svg)](https://github.com/AstrBotDevs/AstrBot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml/badge.svg)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml)
 [![GitHub release](https://img.shields.io/github/v/release/ymshe1065/astrbot_plugin_reply_visible?label=release)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/releases)
 
 > 状态：**v0.1.0 首个公开版本 / AstrBot 市场首发版**，已实现基础捕获、文本注入、图片识别、防学习标注、调试指令
-> 兼容版本：AstrBot `>=4.29.0,<5`
+> 兼容版本：AstrBot `>=4.29.0`
 > GitHub 仓库：<https://github.com/ymshe1065/astrbot_plugin_reply_visible>
 > 版本路线图：[ROADMAP.md](./ROADMAP.md)
 > 开发细节：[DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md)
@@ -127,7 +127,7 @@ rapidocr_onnxruntime>=1.3.0
 
 ## 8. 兼容性
 
-- AstrBot `>=4.29.0,<5`；
+- AstrBot `>=4.29.0`；
 - 当前实测平台：`aiocqhttp`（其他平台需验证后再加入 `support_platforms`）；
 - 使用公开钩子：`after_message_sent`、`on_llm_request`；
 - 不修改 AstrBot 核心；

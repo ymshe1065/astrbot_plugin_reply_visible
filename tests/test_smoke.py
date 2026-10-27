@@ -111,6 +111,9 @@ class Req:
 
 async def _run():
     plugin = Plugin(None, CFG)
+    assert plugin.capture_reply.__doc__
+    assert plugin.inject_replies.__doc__
+    assert plugin.reply_status.__doc__
     event = Event(Result("签到成功，获得 888 灵石"))
 
     await plugin.capture_reply(event)

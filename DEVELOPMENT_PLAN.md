@@ -408,7 +408,7 @@ astrbot_plugin_reply_visible/
 - `after_message_sent` 捕获非 LLM 回复；
 - `Plain` 文本捕获与截断；
 - `Image` 图片捕获；
-- 可选本地 OCR（`rapidocr_onnxruntime`，未安装自动跳过）；
+- 可选本地 OCR（`rapidocr_onnxruntime`，未安装自动回退视觉模型）；
 - 视觉模型图片描述（`vision_provider_id`，留空用 AstrBot 默认图片描述模型）；
 - 按 `unified_msg_origin` 隔离队列；
 - 5 秒内重复内容去重；
@@ -417,7 +417,9 @@ astrbot_plugin_reply_visible/
 - `TextPart.mark_as_temp()` 临时注入；
 - `<plugin_reply_context no_learn="true">` 防学习标注与禁止复述/记忆提示；
 - 临时标记不可用时跳过注入，避免污染会话历史或学习语料；
-- `/插件回复状态` 调试指令；
+- `/插件回复状态` 调试指令，显示本地 OCR 安装状态；
+- 捕获/注入钩子和状态指令的 docstring，供 AstrBot 插件页展示；
+- README 与插件描述中的 OCR 安装方式、OCR / 视觉模型对比；
 - AstrBot 市场元数据（`short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`）；
 - GitHub Actions CI（编译 + 冒烟测试）；
 - `metadata.yaml`、`_conf_schema.json`、`requirements.txt`。

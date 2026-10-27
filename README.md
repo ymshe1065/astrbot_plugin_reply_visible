@@ -44,7 +44,7 @@ AI：我不知道你买了什么……
 | --- | --- |
 | 捕获插件纯文本回复 | ✅ |
 | 捕获插件图片卡片 | ✅ |
-| 图片 OCR（可选） | ✅ 未安装 OCR 时自动跳过 |
+| 图片 OCR（可选，本地运行） | ✅ 未安装时自动回退视觉模型 |
 | 视觉模型生成图片描述 | ✅ |
 | 按群隔离 | ✅ |
 | 5 秒内重复内容去重 | ✅ |
@@ -99,31 +99,60 @@ git clone https://github.com/ymshe1065/astrbot_plugin_reply_visible.git
 | `whitelist_groups` | `[]` | 生效群号；空表示全部 |
 | `max_pending` | `10` | 每群最多暂存条数 |
 | `text_limit` | `800` | 单条文本最大字符数 |
-| `image_caption_enable` | `true` | 是否识别插件图片 |
-| `vision_provider_id` | 空 | 视觉模型 ID；空则用 AstrBot 默认图片描述模型 |
-| `image_caption_prompt` | 见默认 | 图片识别提示词 |
+| `image_caption_enable` | `true` | 是否识别图片；开启时优先本地 OCR，再回退视觉模型 |
+| `vision_provider_id` | 空 | 本地 OCR 未命中时使用的视觉模型；空则用 AstrBot 默认图片描述模型 |
+| `image_caption_prompt` | 见默认 | 视觉模型提示词；本地 OCR 成功时不使用 |
 | `image_caption_limit` | `300` | 单张描述最大字符数 |
 | `image_max_per_turn` | `3` | 单轮最多识别图片数 |
 | `inject_header` | 见默认 | 注入块标题 |
 | `no_learn_enable` | `true` | 是否添加 `no_learn` 防学习标注 |
 
 > 视觉模型必须是**支持图片**的模型。DeepSeek 文本模型不能直接看图，建议填 Qwen-VL、GLM-4V、Gemini 等。
+> 如果主要识别卡片里的文字和数字，优先安装本地 OCR：图片不外发、无 API 费用，数字通常更准。
 
 ## 6. 可选：本地 OCR
 
-安装 `rapidocr_onnxruntime` 后，卡片会优先走本地 OCR，数字更准：
+本地 OCR 是在运行 AstrBot 的机器上，直接把图片里的文字和数字识别成文本，**不把图片发给视觉模型**。
 
-```text
-rapidocr_onnxruntime>=1.3.0
+### 安装
+
+进入 AstrBot 使用的 Python 环境后执行：
+
+```powershell
+python -m pip install "rapidocr_onnxruntime>=1.3.0"
 ```
 
-不安装也能用，会自动回退到视觉模型。
+Windows 启动器实例也可以直接使用实例的 venv：
+
+```powershell
+<实例目录>\venv\Scripts\python.exe -m pip install "rapidocr_onnxruntime>=1.3.0"
+```
+
+安装后重启或重载 AstrBot。不安装也能用，插件会自动回退到视觉模型。
+
+### OCR 与视觉模型的区别
+
+| 对比项 | 本地 OCR | 视觉模型 |
+| --- | --- | --- |
+| 运行位置 | 本机 CPU | 云端 Provider 或自建服务 |
+| 图片是否上传 | 否 | 是 |
+| 费用 | 免费 | 可能按 token / 图片计费 |
+| 擅长 | 文字、数字、表格、卡片数值 | 角色、图标、布局、画面语义 |
+| 数字准确度 | 通常更高 | 取决于模型，可能误读 |
+| 速度 | 首次加载较慢，后续较快 | 受网络、模型和图片大小影响 |
+| 资源占用 | 额外磁盘和 CPU | API 配额和网络 |
+| 配置成本 | 安装依赖即可 | 需要配置支持图片的 Provider |
+| 局限 | 只读文字，不理解图标和画面 | 可能幻觉，数字不一定准 |
+
+识别顺序为：**本地 OCR -> 视觉模型 -> 占位符**。
+
+当前 OCR 只处理**本地图片文件路径**；如果插件图片是 `http/https` 远程 URL，会跳过 OCR，直接交给视觉模型。
 
 ## 7. 调试指令
 
 | 指令 | 作用 |
 | --- | --- |
-| `/插件回复状态` | 查看当前群暂存数量、图片识别状态、视觉模型、防学习标注 |
+| `/插件回复状态` | 查看当前群暂存数量、图片识别、本地 OCR 安装状态、视觉模型、防学习标注 |
 
 ## 8. 兼容性
 

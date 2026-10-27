@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import importlib.util
 import os
 import time
 import uuid
@@ -74,6 +75,17 @@ class ReplyVisiblePlugin(Star):
             if value:
                 return str(value)
         return ""
+
+    def _ocr_installed(self) -> bool:
+        """判断可选 OCR 依赖是否可用，不触发模型加载。"""
+        if self._ocr_engine not in (None, False):
+            return True
+        if self._ocr_engine is False:
+            return False
+        try:
+            return importlib.util.find_spec("rapidocr_onnxruntime") is not None
+        except Exception:
+            return False
 
     def _ocr_image(self, ref: str) -> str:
         """可选本地 OCR；未安装 rapidocr_onnxruntime 时直接跳过。"""
@@ -176,6 +188,7 @@ class ReplyVisiblePlugin(Star):
     # ===== 捕获 =====
     @filter.after_message_sent()
     async def capture_reply(self, event: AstrMessageEvent) -> None:
+        """捕获群内插件/指令发送后的非 LLM 回复，并按群暂存，供下一次 AI 请求使用。"""
         if not self._cfg_bool("enabled", True):
             return
         if self._cfg_bool("group_only", True):
@@ -252,6 +265,7 @@ class ReplyVisiblePlugin(Star):
     # ===== 注入 =====
     @filter.on_llm_request()
     async def inject_replies(self, event: AstrMessageEvent, req) -> None:
+        """在下一次 LLM 请求前，把当前群暂存的插件回复作为临时上下文注入，不写入会话历史。"""
         if not self._cfg_bool("enabled", True):
             return
         if self._cfg_bool("group_only", True):
@@ -330,11 +344,15 @@ class ReplyVisiblePlugin(Star):
     # ===== 调试指令 =====
     @filter.command("插件回复状态")
     async def reply_status(self, event: AstrMessageEvent):
+        """查看本群暂存的插件回复数量、图片识别、本地 OCR、视觉模型和防学习标注状态。"""
         umo = event.unified_msg_origin
         queue = self._pending.get(umo)
         count = len(queue) if queue else 0
         vision = self._cfg_str("vision_provider_id", "").strip() or "跟随 AstrBot 默认图片描述模型"
-        ocr = "可用" if self._ocr_engine not in (None, False) else "未检测/未安装"
+        if self._ocr_installed():
+            ocr = "已安装（首次识别时加载）"
+        else:
+            ocr = "未安装（可选：pip install rapidocr_onnxruntime）"
         enabled = "开启" if self._cfg_bool("enabled", True) else "关闭"
         yield event.plain_result(
             "👁️ 插件回复可见\n"

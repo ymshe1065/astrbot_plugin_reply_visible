@@ -33,19 +33,19 @@
     "description": "识别插件图片",
     "type": "bool",
     "default": true,
-    "hint": "关闭后图片只记录占位符，不调用视觉模型。"
+    "hint": "关闭后图片只记录占位符。开启时优先尝试本地 OCR，未安装或识别失败再回退视觉模型。"
   },
   "vision_provider_id": {
     "description": "视觉模型提供商 ID",
     "type": "string",
     "default": "",
-    "hint": "留空则使用 AstrBot 的默认图片描述模型；DeepSeek 文本模型不能看图，建议填 Qwen-VL / GLM-4V / Gemini 等。"
+    "hint": "本地 OCR 未命中时才调用；留空使用 AstrBot 默认图片描述模型。DeepSeek 文本模型不能看图，建议填 Qwen-VL / GLM-4V / Gemini 等。"
   },
   "image_caption_prompt": {
     "description": "图片识别提示词",
     "type": "string",
     "default": "请用中文描述这张图片，重点提取其中的文字、数字和关键信息，不要推测。",
-    "hint": "卡片的数值准确度主要靠这里和 OCR。"
+    "hint": "本地 OCR 成功时不使用；OCR 未命中时由视觉模型按此提示词描述图片。"
   },
   "image_caption_limit": {
     "description": "单张图片描述上限",

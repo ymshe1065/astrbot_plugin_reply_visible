@@ -56,7 +56,8 @@
 - `/插件回复状态`；
 - AstrBot 市场元数据：`short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`；
 - 插件作者和版权统一为 `ymshe1065`，市场身份为 `ymshe1065/astrbot_plugin_reply_visible`；
-- GitHub Actions CI、ROADMAP、CHANGELOG 和完整 README。
+- GitHub Actions CI、ROADMAP、CHANGELOG 和完整 README；
+- OCR 安装说明、OCR / 视觉模型对比，以及插件页的指令/钩子描述。
 
 **验收**：
 

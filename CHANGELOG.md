@@ -33,6 +33,13 @@
 - 新增 [ROADMAP.md](ROADMAP.md)，明确版本策略和后续版本范围；
 - LICENSE、README、DEVELOPMENT_PLAN 和 CHANGELOG 完整同步。
 
+### 插件页与文档
+
+- 为捕获钩子、注入钩子和 `/插件回复状态` 指令补充 docstring，AstrBot 插件页不再显示“无描述”；
+- README 和 `metadata.yaml` 增加本地 OCR 安装命令、识别顺序和 OCR / 视觉模型优劣对比；
+- 配置提示说明本地 OCR 优先、视觉模型兜底的关系；
+- `/插件回复状态` 显示本地 OCR 是否已安装及安装提示。
+
 ### 兼容性
 
 - 使用公开钩子 `after_message_sent`、`on_llm_request`；

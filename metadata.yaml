@@ -6,7 +6,7 @@ desc: |
 
   插件捕获非 LLM 的指令结果，在下一次 AI 请求前作为临时上下文注入；支持本地 OCR、
   视觉模型描述、按群隔离、去重、限额和防学习标注。注入内容不会写入会话历史。
-version: 0.1.2
+version: 0.1.0
 author: ymshe1065
 repo: https://github.com/ymshe1065/astrbot_plugin_reply_visible
 astrbot_version: ">=4.29.0,<5"

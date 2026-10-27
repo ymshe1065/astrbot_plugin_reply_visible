@@ -19,12 +19,12 @@
 
 | 位置 | 写法 | 示例 |
 | --- | --- | --- |
-| `metadata.yaml` 的 `version` | 不带 `v`，严格 semver | `0.1.2` |
-| `main.py` 的 `@register` 版本 | 不带 `v` | `0.1.2` |
-| GitHub tag | 带 `v` 前缀 | `v0.1.2` |
-| GitHub Release 标题 | 带 `v` 前缀 | `v0.1.2` |
-| `README.md` 状态 | 带 `v` 前缀 | `v0.1.2` |
-| `CHANGELOG.md` 标题 | 带 `v` 前缀 | `v0.1.2` |
+| `metadata.yaml` 的 `version` | 不带 `v`，严格 semver | `0.1.0` |
+| `main.py` 的 `@register` 版本 | 不带 `v` | `0.1.0` |
+| GitHub tag | 带 `v` 前缀 | `v0.1.0` |
+| GitHub Release 标题 | 带 `v` 前缀 | `v0.1.0` |
+| `README.md` 状态 | 带 `v` 前缀 | `v0.1.0` |
+| `CHANGELOG.md` 标题 | 带 `v` 前缀 | `v0.1.0` |
 
 > AstrBot 市场读取 `metadata.yaml` 的版本；GitHub tag 只用于代码归档和 Release。两者语义一致，但格式不同。
 
@@ -32,9 +32,7 @@
 
 | 版本 | 状态 | 主题 | 关键交付 |
 | --- | --- | --- | --- |
-| v0.1.0 | 已发布 | 首个公开版本 | 基础捕获、临时注入、图片识别、防学习标注、状态指令 |
-| v0.1.1 | 已发布 | AstrBot 市场规范合规 | 修正版本格式，补齐市场元数据、README、CI，无功能变更 |
-| v0.1.2 | 已发布 | 作者身份统一 | 作者改为 `ymshe1065`，市场身份与 GitHub 账号一致 |
+| v0.1.0 | 已发布 | 首个公开版本 / 市场首发 | 基础捕获、临时注入、图片识别、防学习标注、市场元数据、CI |
 | v0.2.0 | 计划 | 捕获层重构 | 双钩子、组件解析器、多段合并、调试追踪 |
 | v0.3.0 | 计划 | 上下文治理 | 过期时间、总预算、发送者隔离、过滤器、注入失败恢复 |
 | v0.4.0 | 计划 | 图片管线 | 发送前缓存、本地路径归一化、并发识别、缓存 TTL |
@@ -44,9 +42,9 @@
 
 ## 3. 各版本范围
 
-### v0.1.0 — 首个公开版本（已发布）
+### v0.1.0 — 首个公开版本 / 市场首发（已发布）
 
-**目标**：验证“捕获插件回复并临时注入 AI 上下文”的核心链路。
+**目标**：验证“捕获插件回复并临时注入 AI 上下文”的核心链路，并满足 AstrBot 市场首发要求。
 
 **已交付**：
 
@@ -55,53 +53,19 @@
 - 图片 OCR / 视觉模型描述；
 - 群隔离、去重、单条/队列/图片数量限制；
 - `no_learn` 防学习标注和 `mark_as_temp()` 临时注入；
-- `/插件回复状态`。
-
-**不包含**：多组件解析、过期策略、发送者隔离、市场元数据。
-
-### v0.1.1 — AstrBot 市场规范合规（已发布）
-
-**目标**：不改变功能行为，只让仓库和元数据符合 AstrBot 市场规范。
-
-**交付**：
-
-- `metadata.yaml` 的 `version` 从 `v0.1.0` 改为 `0.1.1`；
-- 补齐 `short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`；
-- 多行 `desc`，说明捕获范围、图片识别、临时注入和防学习标注；
-- `main.py` 注册版本同步为 `0.1.1`；
-- 更新 README 的版本、兼容性、目录结构和路线图入口；
-- 新增 GitHub Actions CI（编译 + 冒烟测试）；
-- 新增本路线图和 CHANGELOG 记录。
+- `/插件回复状态`；
+- AstrBot 市场元数据：`short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`；
+- 插件作者和版权统一为 `ymshe1065`，市场身份为 `ymshe1065/astrbot_plugin_reply_visible`；
+- GitHub Actions CI、ROADMAP、CHANGELOG 和完整 README。
 
 **验收**：
 
-- `metadata.yaml` 可被 YAML 解析，必填字段齐全；
-- 代码冒烟测试通过；
-- 版本号在各位置一致；
-- 不修改任何运行时行为。
-
-**不包含**：新功能、新配置、新钩子、图片管线改造。
-
-### v0.1.2 — 作者身份统一（本次）
-
-**目标**：让插件作者、市场身份和 GitHub 账号保持一致。
-
-**交付**：
-
-- `metadata.yaml` 的 `author` 从 `dafeiyu-tools` 改为 `ymshe1065`；
-- 插件市场身份变为 `ymshe1065/astrbot_plugin_reply_visible`；
-- `main.py` 的 `@register` 作者同步为 `ymshe1065`；
-- LICENSE 版权署名同步为 `ymshe1065`；
-- `metadata.yaml` 和 `main.py` 版本同步为 `0.1.2`；
-- README、DEVELOPMENT_PLAN 和 CHANGELOG 更新。
-
-**验收**：
-
-- `author + "/" + name` 等于 `ymshe1065/astrbot_plugin_reply_visible`；
+- `metadata.yaml` 可被 YAML 解析，市场必填字段齐全；
 - 版本号在 metadata、注册信息、README、CHANGELOG 和 tag 中一致；
-- 不修改运行时行为。
+- 冒烟测试和 CI 通过；
+- 不修改 AstrBot 核心和其他插件。
 
-**不包含**：新功能、配置变更、数据迁移。
+**不包含**：多组件解析、过期策略、发送者隔离、图片管线重构。
 
 ### v0.2.0 — 捕获层重构
 

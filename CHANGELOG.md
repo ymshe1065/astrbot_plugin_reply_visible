@@ -2,48 +2,9 @@
 
 本项目的重要变更会记录在这里。
 
-## v0.1.2 — 2026-10-27
-
-作者身份统一版本，无运行时行为变更。
-
-### 变更
-
-- 插件作者从 `dafeiyu-tools` 统一为 GitHub 账号 `ymshe1065`；
-- 插件市场身份变更为 `ymshe1065/astrbot_plugin_reply_visible`；
-- `metadata.yaml` 的 `version` 更新为 `0.1.2`；
-- `main.py` 的 `@register` 作者和版本同步更新；
-- LICENSE 版权署名更新为 `ymshe1065`；
-- README 和 DEVELOPMENT_PLAN 状态更新为 v0.1.2。
-
-### 兼容性
-
-- AstrBot `>=4.29.0,<5`；
-- 当前声明平台：`aiocqhttp`；
-- 不修改任何运行时逻辑，已有配置无需迁移。
-
-## v0.1.1 — 2026-10-27
-
-AstrBot 插件市场规范合规版本，无运行时行为变更。
-
-### 变更
-
-- `metadata.yaml` 版本从 `v0.1.0` 修正为 `0.1.1`，不带 `v` 前缀；
-- 补齐 `short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`；
-- `desc` 改为多行 Markdown，说明捕获范围、图片识别和临时注入；
-- `main.py` 注册版本同步为 `0.1.1`；
-- 新增 GitHub Actions CI（编译 + 冒烟测试）；
-- 新增 [ROADMAP.md](ROADMAP.md)，明确版本策略和后续版本范围；
-- 更新 README 的版本、兼容性、目录结构和路线图入口。
-
-### 兼容性
-
-- AstrBot `>=4.29.0,<5`；
-- 当前声明平台：`aiocqhttp`；
-- 不修改任何运行时逻辑。
-
 ## v0.1.0 — 2026-10-27
 
-首个公开版本。
+首个公开版本，也是 AstrBot 市场首发版本。
 
 ### 新增
 
@@ -56,9 +17,24 @@ AstrBot 插件市场规范合规版本，无运行时行为变更。
 - `TextPart.mark_as_temp()` 临时注入，不写入会话历史；
 - `/插件回复状态` 调试指令。
 
+### AstrBot 市场信息
+
+- 插件 ID：`ymshe1065/astrbot_plugin_reply_visible`；
+- 作者：`ymshe1065`；
+- 版本：`0.1.0`；
+- 兼容 AstrBot `>=4.29.0,<5`；
+- 声明平台：`aiocqhttp`；
+- 开源协议：MIT。
+
+### 工程质量
+
+- `metadata.yaml` 补齐 `short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`；
+- 新增 GitHub Actions CI（编译 + 冒烟测试）；
+- 新增 [ROADMAP.md](ROADMAP.md)，明确版本策略和后续版本范围；
+- LICENSE、README、DEVELOPMENT_PLAN 和 CHANGELOG 完整同步。
+
 ### 兼容性
 
-- AstrBot 4.29.x；
 - 使用公开钩子 `after_message_sent`、`on_llm_request`；
 - 不修改 AstrBot 核心和其他插件。
 
@@ -67,4 +43,5 @@ AstrBot 插件市场规范合规版本，无运行时行为变更。
 - 只捕获走标准回复链的插件；
 - 暂存队列保存在内存中，插件重启后丢失；
 - selflearning 仍会把原始插件回复当作 Bot 出站消息记录，需在 selflearning 侧过滤；
-- 合并转发、文件、语音暂未解析。
+- 合并转发、文件、语音暂未解析；
+- 当前只在 `aiocqhttp` 适配器实测。

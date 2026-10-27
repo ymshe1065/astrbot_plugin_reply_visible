@@ -5,7 +5,7 @@
 [![CI](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml/badge.svg)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml)
 [![GitHub release](https://img.shields.io/github/v/release/ymshe1065/astrbot_plugin_reply_visible?label=release)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/releases)
 
-> 状态：**v0.1.1 市场规范版**，已实现基础捕获、文本注入、图片识别、防学习标注、调试指令
+> 状态：**v0.1.2 市场规范版**，已实现基础捕获、文本注入、图片识别、防学习标注、调试指令
 > 兼容版本：AstrBot `>=4.29.0,<5`
 > GitHub 仓库：<https://github.com/ymshe1065/astrbot_plugin_reply_visible>
 > 版本路线图：[ROADMAP.md](./ROADMAP.md)

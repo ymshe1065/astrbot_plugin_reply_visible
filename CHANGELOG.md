@@ -2,6 +2,25 @@
 
 本项目的重要变更会记录在这里。
 
+## v0.1.2 — 2026-10-27
+
+作者身份统一版本，无运行时行为变更。
+
+### 变更
+
+- 插件作者从 `dafeiyu-tools` 统一为 GitHub 账号 `ymshe1065`；
+- 插件市场身份变更为 `ymshe1065/astrbot_plugin_reply_visible`；
+- `metadata.yaml` 的 `version` 更新为 `0.1.2`；
+- `main.py` 的 `@register` 作者和版本同步更新；
+- LICENSE 版权署名更新为 `ymshe1065`；
+- README 和 DEVELOPMENT_PLAN 状态更新为 v0.1.2。
+
+### 兼容性
+
+- AstrBot `>=4.29.0,<5`；
+- 当前声明平台：`aiocqhttp`；
+- 不修改任何运行时逻辑，已有配置无需迁移。
+
 ## v0.1.1 — 2026-10-27
 
 AstrBot 插件市场规范合规版本，无运行时行为变更。

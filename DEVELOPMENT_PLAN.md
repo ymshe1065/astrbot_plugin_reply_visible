@@ -1,7 +1,8 @@
 # 插件回复可见 · 开发计划
 
-> 状态：**v0.1.0 已实现基础版本**（文本捕获/注入、图片识别、调试指令）
+> 状态：**v0.1.1 市场规范版**（基础捕获/注入、图片识别、防学习标注、调试指令）
 > 目标：让 AstrBot 的 AI 能读取群内插件/指令的回复，包括纯文本和图片卡片
+> 版本节奏与发布计划以 [ROADMAP.md](./ROADMAP.md) 为准
 
 ---
 
@@ -234,6 +235,8 @@ pending: dict[str, deque[PendingItem]]
 
 ## 6. 开发阶段
 
+> 以下是早期技术阶段划分，保留作为设计参考；实际版本节奏、范围和验收标准以 [ROADMAP.md](./ROADMAP.md) 为准。
+
 ### Phase 0：项目骨架
 
 - 创建 `metadata.yaml`、`_conf_schema.json`、`main.py` 空壳；
@@ -293,7 +296,7 @@ AI：你法防 2745……
 
 - 单元测试：捕获、去重、截断、注入；
 - 集成测试：群内文本/图片；
-- 兼容性测试：AstrBot 4.29.x；
+- 兼容性测试：AstrBot `>=4.29.0,<5`；
 - 编写 `requirements.txt`（如需 Pillow）；
 - 更新 README；
 - 打包发布。
@@ -380,20 +383,24 @@ AI：你法防 2745……
 ```text
 astrbot_plugin_reply_visible/
 ├── README.md
+├── ROADMAP.md
 ├── DEVELOPMENT_PLAN.md
+├── CHANGELOG.md
+├── LICENSE
 ├── metadata.yaml
 ├── _conf_schema.json
 ├── main.py
 ├── requirements.txt
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 └── tests/
-    ├── test_capture.py
-    ├── test_inject.py
-    └── test_image.py
+    └── test_smoke.py
 ```
 
 ---
 
-## 11. 当前实现状态（v0.1.0）
+## 11. 当前实现状态（v0.1.1）
 
 已实现：
 
@@ -411,6 +418,8 @@ astrbot_plugin_reply_visible/
 - `<plugin_reply_context no_learn="true">` 防学习标注与禁止复述/记忆提示；
 - 临时标记不可用时跳过注入，避免污染会话历史或学习语料；
 - `/插件回复状态` 调试指令；
+- AstrBot 市场元数据（`short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`）；
+- GitHub Actions CI（编译 + 冒烟测试）；
 - `metadata.yaml`、`_conf_schema.json`、`requirements.txt`。
 
 尚未实现 / 后续：
@@ -426,7 +435,10 @@ astrbot_plugin_reply_visible/
 
 ### 下一步优先级
 
-1. 在群里实测修仙 `签到/购买/切磋/我的信息`；
-2. 根据实测补 `on_decorating_result` 兜底；
-3. 补图片本地缓存与 OCR 安装说明；
-4. 再做持久化和按插件开关。
+版本范围和验收以 [ROADMAP.md](./ROADMAP.md) 为准：
+
+1. **v0.2.0 捕获层重构**：`on_decorating_result` + `after_message_sent` 双钩子、组件解析器、调试追踪；
+2. **v0.3.0 上下文治理**：过期时间、总预算、发送者隔离、命令过滤、注入失败恢复；
+3. **v0.4.0 图片管线**：发送前缓存、本地路径归一化、OCR 线程化、并发视觉识别；
+4. **v0.5.0 稳定性**：指标、管理指令、配置校验、优雅关闭；
+5. **v0.6.0 平台适配**：平台矩阵、logo、i18n、市场试发布。

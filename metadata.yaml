@@ -1,6 +1,22 @@
 name: astrbot_plugin_reply_visible
 display_name: 插件回复可见
-desc: 让 AI 看见群内插件/指令的回复（文本 + 图片卡片），并支持防学习标注
-version: v0.1.0
+short_desc: 让 AI 看见群内插件/指令的回复，支持文本、图片卡片与防学习标注。
+desc: |
+  让 AstrBot 的 AI 看见群内插件/指令的回复，包括纯文本、图片卡片和文本转图片卡片。
+
+  插件捕获非 LLM 的指令结果，在下一次 AI 请求前作为临时上下文注入；支持本地 OCR、
+  视觉模型描述、按群隔离、去重、限额和防学习标注。注入内容不会写入会话历史。
+version: 0.1.1
 author: dafeiyu-tools
 repo: https://github.com/ymshe1065/astrbot_plugin_reply_visible
+astrbot_version: ">=4.29.0,<5"
+support_platforms:
+  - aiocqhttp
+tags:
+  - astrbot
+  - plugin
+  - ai
+  - context
+  - image
+  - selflearning
+social_link: https://github.com/ymshe1065

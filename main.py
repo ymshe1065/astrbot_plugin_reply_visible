@@ -22,7 +22,7 @@ from astrbot.core.agent.message import TextPart
     "astrbot_plugin_reply_visible",
     "dafeiyu-tools",
     "让 AI 看见群内插件/指令的回复（文本 + 图片卡片），并接入 AI 上下文",
-    "0.1.0",
+    "0.1.1",
 )
 class ReplyVisiblePlugin(Star):
     """捕获非 LLM 的插件回复，并在下一次 LLM 请求时注入。"""

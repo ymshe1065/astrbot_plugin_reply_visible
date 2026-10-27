@@ -2,6 +2,26 @@
 
 本项目的重要变更会记录在这里。
 
+## v0.1.1 — 2026-10-27
+
+AstrBot 插件市场规范合规版本，无运行时行为变更。
+
+### 变更
+
+- `metadata.yaml` 版本从 `v0.1.0` 修正为 `0.1.1`，不带 `v` 前缀；
+- 补齐 `short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`；
+- `desc` 改为多行 Markdown，说明捕获范围、图片识别和临时注入；
+- `main.py` 注册版本同步为 `0.1.1`；
+- 新增 GitHub Actions CI（编译 + 冒烟测试）；
+- 新增 [ROADMAP.md](ROADMAP.md)，明确版本策略和后续版本范围；
+- 更新 README 的版本、兼容性、目录结构和路线图入口。
+
+### 兼容性
+
+- AstrBot `>=4.29.0,<5`；
+- 当前声明平台：`aiocqhttp`；
+- 不修改任何运行时逻辑。
+
 ## v0.1.0 — 2026-10-27
 
 首个公开版本。

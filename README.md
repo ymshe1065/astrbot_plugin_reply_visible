@@ -5,7 +5,7 @@
 [![CI](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml/badge.svg)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml)
 [![GitHub release](https://img.shields.io/github/v/release/ymshe1065/astrbot_plugin_reply_visible?label=release)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/releases)
 
-> 状态：**v0.1.0 首个公开版本 / AstrBot 市场首发版**，已实现基础捕获、文本注入、图片识别、防学习标注、调试指令
+> 状态：**v0.2.0 开发中（未发布）**，捕获层重构：双钩子、组件解析、多段合并、调试指令
 > 兼容版本：AstrBot `>=4.29.0`
 > GitHub 仓库：<https://github.com/ymshe1065/astrbot_plugin_reply_visible>
 > 版本路线图：[ROADMAP.md](./ROADMAP.md)
@@ -14,7 +14,8 @@
 | 项目 | 信息 |
 | --- | --- |
 | 插件 ID | `ymshe1065/astrbot_plugin_reply_visible` |
-| 当前版本 | `0.1.0` |
+| 当前开发版本 | `0.2.0` |
+| GitHub 最新发布 | `0.1.0` |
 | 作者 | `ymshe1065` |
 | 支持平台 | `aiocqhttp` |
 | 开源协议 | MIT |
@@ -42,8 +43,14 @@ AI：我不知道你买了什么……
 
 | 能力 | 状态 |
 | --- | --- |
+| 发送前 + 发送后双钩子捕获 | ✅ |
 | 捕获插件纯文本回复 | ✅ |
 | 捕获插件图片卡片 | ✅ |
+| JSON / Ark 卡片解析 | ✅ |
+| 合并转发 / Nodes 递归解析 | ✅ |
+| 文件、语音、视频、引用、@ 等组件 | ✅ |
+| 回复对象 / 插件来源标注 | ✅ |
+| 多段回复合并 | ✅ |
 | 图片 OCR（可选，本地运行） | ✅ 未安装时自动回退视觉模型 |
 | 视觉模型生成图片描述 | ✅ |
 | 按群隔离 | ✅ |
@@ -52,7 +59,9 @@ AI：我不知道你买了什么……
 | 注入后清空，只出现一次 | ✅ |
 | 防提示词注入包装 | ✅ |
 | 防学习标注（`no_learn`，兼容自学习插件） | ✅ |
-| 调试指令 `/插件回复状态` | ✅ |
+| 调试指令 `/插件回复状态`、`/插件回复调试` | ✅ |
+
+v0.2.0 的捕获范围包括 `Plain`、`At`、`Image`、`Json`、`Nodes` / `Forward`、`File`、`Record`、`Video`、`Reply`、`Face`、`Poke`、`Share`、`Location`。未知组件只记录类型，不阻塞主流程；发送前钩子会保留 T2I 卡片渲染前的原始文本。
 
 ## 3. 使用效果
 
@@ -69,6 +78,15 @@ AI：你当前法防 2745……
 用户：我刚才签到赚了多少？
 AI：你刚才签到获得了 888 灵石。
 ```
+
+注入到 AI 上下文时会带上插件来源和回复对象，例如：
+
+```text
+[插件：修仙 ProMax（astrbot_plugin_xiuxian_promax） | 回复对象：张三(10001) | 指令：/签到]
+签到成功，获得 888 灵石
+```
+
+如果无法从 AstrBot 已激活 handler 推断插件名，会标注“未知插件”，不会编造。
 
 ## 4. 安装
 
@@ -99,6 +117,7 @@ git clone https://github.com/ymshe1065/astrbot_plugin_reply_visible.git
 | `whitelist_groups` | `[]` | 生效群号；空表示全部 |
 | `max_pending` | `10` | 每群最多暂存条数 |
 | `text_limit` | `800` | 单条文本最大字符数 |
+| `merge_window_ms` | `800` | 同一发送者、同一指令的多段结果合并窗口；`0` 关闭 |
 | `image_caption_enable` | `true` | 是否识别图片；开启时优先本地 OCR，再回退视觉模型 |
 | `vision_provider_id` | 空 | 本地 OCR 未命中时使用的视觉模型；空则用 AstrBot 默认图片描述模型 |
 | `image_caption_prompt` | 见默认 | 视觉模型提示词；本地 OCR 成功时不使用 |
@@ -153,12 +172,13 @@ Windows 启动器实例也可以直接使用实例的 venv：
 | 指令 | 作用 |
 | --- | --- |
 | `/插件回复状态` | 查看当前群暂存数量、图片识别、本地 OCR 安装状态、视觉模型、防学习标注 |
+| `/插件回复调试` | 查看最近一次捕获阶段、组件类型、跳过原因和队列概况 |
 
 ## 8. 兼容性
 
 - AstrBot `>=4.29.0`；
 - 当前实测平台：`aiocqhttp`（其他平台需验证后再加入 `support_platforms`）；
-- 使用公开钩子：`after_message_sent`、`on_llm_request`；
+- 使用公开钩子：`on_decorating_result`、`after_message_sent`、`on_llm_request`；
 - 不修改 AstrBot 核心；
 - 不修改其他插件。
 
@@ -176,12 +196,15 @@ astrbot_plugin_reply_visible/
 ├── metadata.yaml
 ├── _conf_schema.json
 ├── main.py
+├── component_parser.py
 ├── requirements.txt
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
 └── tests/
-    └── test_smoke.py
+    ├── astrbot_stub.py
+    ├── test_smoke.py
+    └── test_component_parser.py
 ```
 
 ## 10. 开源协议

@@ -1,74 +1,17 @@
-"""不依赖 AstrBot 运行时的冒烟测试：用 stub 验证捕获/去重/注入。"""
+"""插件捕获、合并、注入的冒烟测试。"""
 
 import asyncio
 import importlib.util
-import logging
 import sys
 import types
 from pathlib import Path
 
-PLUGIN_MAIN = Path(__file__).resolve().parent.parent / "main.py"
+import astrbot_stub
 
-# ---------- stub astrbot modules ----------
-astrbot = types.ModuleType("astrbot")
-api = types.ModuleType("astrbot.api")
-api.AstrBotConfig = dict
-api.logger = logging.getLogger("stub")
-
-event_mod = types.ModuleType("astrbot.api.event")
-class AstrMessageEvent: ...
-event_mod.AstrMessageEvent = AstrMessageEvent
-class _Filter:
-    def after_message_sent(self, *a, **k): return lambda f: f
-    def on_llm_request(self, *a, **k): return lambda f: f
-    def command(self, *a, **k): return lambda f: f
-event_mod.filter = _Filter()
-
-comp_mod = types.ModuleType("astrbot.api.message_components")
-class Image:
-    def __init__(self, url=""): self.url = url
-class Plain:
-    def __init__(self, text=""): self.text = text
-comp_mod.Image = Image
-comp_mod.Plain = Plain
-
-platform_mod = types.ModuleType("astrbot.api.platform")
-class MessageType:
-    GROUP_MESSAGE = "group"
-    PRIVATE_MESSAGE = "private"
-platform_mod.MessageType = MessageType
-
-star_mod = types.ModuleType("astrbot.api.star")
-class Context: ...
-class Star:
-    def __init__(self, context=None): self.context = context
-def register(*a, **k): return lambda cls: cls
-star_mod.Context = Context
-star_mod.Star = Star
-star_mod.register = register
-
-agent_mod = types.ModuleType("astrbot.core.agent.message")
-class TextPart:
-    def __init__(self, text=""):
-        self.text = text
-        self.no_save = False
-    def mark_as_temp(self):
-        self.no_save = True
-        return self
-agent_mod.TextPart = TextPart
-
-for name, mod in {
-    "astrbot": astrbot,
-    "astrbot.api": api,
-    "astrbot.api.event": event_mod,
-    "astrbot.api.message_components": comp_mod,
-    "astrbot.api.platform": platform_mod,
-    "astrbot.api.star": star_mod,
-    "astrbot.core": types.ModuleType("astrbot.core"),
-    "astrbot.core.agent": types.ModuleType("astrbot.core.agent"),
-    "astrbot.core.agent.message": agent_mod,
-}.items():
-    sys.modules[name] = mod
+PLUGIN_DIR = Path(__file__).resolve().parent.parent
+PLUGIN_MAIN = PLUGIN_DIR / "main.py"
+sys.path.insert(0, str(PLUGIN_DIR))
+astrbot_stub.install()
 
 spec = importlib.util.spec_from_file_location("reply_visible_main", PLUGIN_MAIN)
 mod = importlib.util.module_from_spec(spec)
@@ -81,6 +24,7 @@ CFG = {
     "whitelist_groups": [],
     "max_pending": 10,
     "text_limit": 800,
+    "merge_window_ms": 0,
     "image_caption_enable": False,
     "vision_provider_id": "",
     "image_caption_prompt": "describe",
@@ -90,31 +34,97 @@ CFG = {
     "no_learn_enable": True,
 }
 
+
 class Result:
     def __init__(self, text="", chain=None, llm=False):
         self.text = text
         self.chain = chain or []
         self.llm = llm
-    def is_llm_result(self): return self.llm
-    def get_plain_text(self): return self.text
+
+    def is_llm_result(self):
+        return self.llm
+
+    def get_plain_text(self):
+        return self.text
+
 
 class Event:
     unified_msg_origin = "napcat:GroupMessage:1"
-    message_str = "/签到"
-    def __init__(self, result): self.result = result
-    def get_message_type(self): return MessageType.GROUP_MESSAGE
-    def get_group_id(self): return "1"
-    def get_result(self): return self.result
+
+    def __init__(self, result, message_str="/签到"):
+        self.result = result
+        self.message_str = message_str
+        self._extras = {}
+
+    def get_message_type(self):
+        return astrbot_stub.MessageType.GROUP_MESSAGE
+
+    def get_group_id(self):
+        return "1"
+
+    def get_result(self):
+        return self.result
+
+    def get_sender_id(self):
+        return "10001"
+
+    def get_sender_name(self):
+        return "测试用户"
+
+    def set_extra(self, key, value):
+        self._extras[key] = value
+
+    def get_extra(self, key, default=None):
+        return self._extras.get(key, default)
+
+    def plain_result(self, text):
+        return types.SimpleNamespace(text=text)
+
 
 class Req:
-    def __init__(self): self.extra_user_content_parts = []
+    def __init__(self):
+        self.extra_user_content_parts = []
+
 
 async def _run():
     plugin = Plugin(None, CFG)
+    assert plugin.capture_before_send.__doc__
     assert plugin.capture_reply.__doc__
     assert plugin.inject_replies.__doc__
     assert plugin.reply_status.__doc__
+    assert plugin.reply_debug.__doc__
+
+    class FakeCommandFilter:
+        def get_complete_command_names(self):
+            return ["签到"]
+
+    mod.star_map = {
+        "test.plugin.main": types.SimpleNamespace(
+            name="test_plugin", display_name="测试插件"
+        )
+    }
     event = Event(Result("签到成功，获得 888 灵石"))
+    event.set_extra(
+        "activated_handlers",
+        [
+            types.SimpleNamespace(
+                handler_module_path="test.plugin.main",
+                event_filters=[FakeCommandFilter()],
+            )
+        ],
+    )
+    assert plugin._plugin_info(event) == ("test_plugin", "测试插件")
+    prefix = plugin._format_prefix(
+        {
+            "plugin_name": "test_plugin",
+            "plugin_display_name": "测试插件",
+            "sender_id": "10001",
+            "sender_name": "测试用户",
+            "source": "/签到",
+        }
+    )
+    assert "插件：测试插件（test_plugin）" in prefix
+    assert "回复对象：测试用户(10001)" in prefix
 
     await plugin.capture_reply(event)
     assert len(plugin._pending[event.unified_msg_origin]) == 1
@@ -124,7 +134,7 @@ async def _run():
     assert len(plugin._pending[event.unified_msg_origin]) == 1
 
     # 图片只记录占位符（关闭识别）
-    image_event = Event(Result("", [Image("http://example.com/card.png")]))
+    image_event = Event(Result("", [astrbot_stub.Image("http://example.com/card.png")]))
     await plugin.capture_reply(image_event)
     assert len(plugin._pending[event.unified_msg_origin]) == 2
 
@@ -135,6 +145,8 @@ async def _run():
     text = part.text
     assert "888" in text
     assert "图片" in text
+    assert "插件：测试插件（test_plugin）" in text
+    assert "回复对象：测试用户(10001)" in text
     assert 'no_learn="true"' in text
     assert "plugin_reply_context" in text
     assert part.no_save is True
@@ -145,6 +157,40 @@ async def _run():
     await plugin.inject_replies(event, req2)
     assert len(req2.extra_user_content_parts) == 0
 
+    # 发送前钩子捕获后，发送后兜底不再重复
+    pre_plugin = Plugin(None, CFG)
+    pre_event = Event(Result("发送前捕获"))
+    await pre_plugin.capture_before_send(pre_event)
+    assert len(pre_plugin._pending[pre_event.unified_msg_origin]) == 1
+    await pre_plugin.capture_reply(pre_event)
+    assert len(pre_plugin._pending[pre_event.unified_msg_origin]) == 1
+
+    # 多段回复合并
+    merge_plugin = Plugin(None, {**CFG, "merge_window_ms": 2000})
+    await merge_plugin.capture_reply(Event(Result("第一段")))
+    await merge_plugin.capture_reply(Event(Result("第二段")))
+    queue = merge_plugin._pending["napcat:GroupMessage:1"]
+    assert len(queue) == 1
+    assert "第一段" in queue[0]["text"] and "第二段" in queue[0]["text"]
+
+    # 调试指令
+    debug_event = Event(Result("调试捕获"))
+    debug_event.set_extra(
+        "activated_handlers",
+        [
+            types.SimpleNamespace(
+                handler_module_path="test.plugin.main",
+                event_filters=[FakeCommandFilter()],
+            )
+        ],
+    )
+    await plugin.capture_reply(debug_event)
+    debug_messages = [item.text async for item in plugin.reply_debug(debug_event)]
+    assert debug_messages
+    assert "已捕获" in debug_messages[0]
+    assert "测试插件" in debug_messages[0]
+    assert "测试用户(10001)" in debug_messages[0]
+
     # 关闭防学习标注时，仍保持临时注入
     plugin_off = Plugin(None, {**CFG, "no_learn_enable": False})
     event_off = Event(Result("签到成功，获得 888 灵石"))
@@ -154,6 +200,13 @@ async def _run():
     assert len(req_off.extra_user_content_parts) == 1
     assert "no_learn" not in req_off.extra_user_content_parts[0].text
     assert req_off.extra_user_content_parts[0].no_save is True
+
+    # LLM 回复不捕获
+    llm_event = Event(Result("AI 自己的回复", llm=True))
+    before = len(plugin._pending[llm_event.unified_msg_origin])
+    await plugin.capture_reply(llm_event)
+    assert len(plugin._pending[llm_event.unified_msg_origin]) == before
+
 
 if __name__ == "__main__":
     asyncio.run(_run())

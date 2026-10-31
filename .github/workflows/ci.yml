@@ -20,7 +20,10 @@ jobs:
           python-version: "3.12"
 
       - name: Compile
-        run: python -m compileall -q main.py tests
+        run: python -m compileall -q main.py component_parser.py tests
 
       - name: Smoke test
         run: python tests/test_smoke.py
+
+      - name: Component parser test
+        run: python tests/test_component_parser.py

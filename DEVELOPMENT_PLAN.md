@@ -1,7 +1,7 @@
 # 插件回复可见 · 开发计划
 
-> 状态：**v0.1.0 首个公开版本**（基础捕获/注入、图片识别、防学习标注、市场元数据、调试指令）
-> 目标：让 AstrBot 的 AI 能读取群内插件/指令的回复，包括纯文本和图片卡片
+> 状态：**v0.2.0 开发中（未发布）**（双钩子、组件解析、多段合并、调试指令）
+> 目标：让 AstrBot 的 AI 能读取群内插件/指令的回复，包括文本、图片、JSON 和合并转发
 > 版本节奏与发布计划以 [ROADMAP.md](./ROADMAP.md) 为准
 
 ---
@@ -400,14 +400,17 @@ astrbot_plugin_reply_visible/
 
 ---
 
-## 11. 当前实现状态（v0.1.0）
+## 11. 当前实现状态（v0.2.0 开发中）
 
 已实现：
 
 - `main.py` 插件骨架与 `@register` 注册；
-- `after_message_sent` 捕获非 LLM 回复；
-- `Plain` 文本捕获与截断；
-- `Image` 图片捕获；
+- `on_decorating_result` 发送前捕获 + `after_message_sent` 发送后兜底；
+- `component_parser.py` 解析 `Plain`、`At`、`Image`、`Json`、`Nodes` / `Forward`、`File`、`Record`、`Video`、`Reply`、`Face`、`Poke`、`Share`、`Location`；
+- 多段回复按发送者/指令合并，窗口 `merge_window_ms` 默认 800ms；
+- 注入时标注插件来源、回复对象和触发指令，无法识别插件时标注“未知插件”；
+- 跳过自身调试指令、帮助菜单和明显错误；
+- 图片识别改为后台任务，注入时最多等待 2 秒；
 - 可选本地 OCR（`rapidocr_onnxruntime`，未安装自动回退视觉模型）；
 - 视觉模型图片描述（`vision_provider_id`，留空用 AstrBot 默认图片描述模型）；
 - 按 `unified_msg_origin` 隔离队列；
@@ -417,20 +420,20 @@ astrbot_plugin_reply_visible/
 - `TextPart.mark_as_temp()` 临时注入；
 - `<plugin_reply_context no_learn="true">` 防学习标注与禁止复述/记忆提示；
 - 临时标记不可用时跳过注入，避免污染会话历史或学习语料；
-- `/插件回复状态` 调试指令，显示本地 OCR 安装状态；
+- `/插件回复状态`、`/插件回复调试` 调试指令；
 - 捕获/注入钩子和状态指令的 docstring，供 AstrBot 插件页展示；
 - README 与插件描述中的 OCR 安装方式、OCR / 视觉模型对比；
 - AstrBot 市场元数据（`short_desc`、`astrbot_version`、`support_platforms`、`tags`、`social_link`）；
-- GitHub Actions CI（编译 + 冒烟测试）；
+- GitHub Actions CI（编译 + 冒烟测试 + 组件解析测试）；
 - `metadata.yaml`、`_conf_schema.json`、`requirements.txt`。
 
 尚未实现 / 后续：
 
-- `on_decorating_result` 双钩子兜底（兼容直接发送的插件）；
-- 合并转发、文件、语音等组件的占位处理；
+- 过期时间、总预算、发送者隔离、命令过滤（v0.3.0）；
+- 图片发送前缓存、远程图下载、OCR 线程化和并发限流（v0.4.0）；
 - 队列持久化；
 - 按插件/指令白名单过滤；
-- 单元测试与群内集成测试；
+- 群内集成测试；
 - `/插件回复清空`、`/插件回复测试`；
 - 图片本地缓存目录（避免临时文件被删）；
 - 与 selflearning 的深度联动（需对方识别 `no_learn` 或过滤非 LLM 出站消息）。

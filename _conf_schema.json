@@ -29,6 +29,12 @@
     "default": 800,
     "hint": "单条插件回复最多注入多少字符，防止长战报撑爆上下文。"
   },
+  "merge_window_ms": {
+    "description": "多段回复合并窗口（毫秒）",
+    "type": "int",
+    "default": 800,
+    "hint": "同一发送者、同一指令在这个时间窗口内的多条结果会合并为一条；设为 0 关闭合并。"
+  },
   "image_caption_enable": {
     "description": "识别插件图片",
     "type": "bool",

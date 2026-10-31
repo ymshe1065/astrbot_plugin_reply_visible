@@ -5,7 +5,7 @@
 [![CI](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml/badge.svg)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/actions/workflows/ci.yml)
 [![GitHub release](https://img.shields.io/github/v/release/ymshe1065/astrbot_plugin_reply_visible?label=release)](https://github.com/ymshe1065/astrbot_plugin_reply_visible/releases)
 
-> 状态：**v0.2.0 开发中（未发布）**，捕获层重构：双钩子、组件解析、多段合并、调试指令
+> 状态：**v0.2.0 已发布**，捕获层重构：双钩子、组件解析、多段合并、来源标注、调试指令
 > 兼容版本：AstrBot `>=4.29.0`
 > GitHub 仓库：<https://github.com/ymshe1065/astrbot_plugin_reply_visible>
 > 版本路线图：[ROADMAP.md](./ROADMAP.md)
@@ -14,8 +14,8 @@
 | 项目 | 信息 |
 | --- | --- |
 | 插件 ID | `ymshe1065/astrbot_plugin_reply_visible` |
-| 当前开发版本 | `0.2.0` |
-| GitHub 最新发布 | `0.1.0` |
+| 当前版本 | `0.2.0` |
+| GitHub 最新发布 | `0.2.0` |
 | 作者 | `ymshe1065` |
 | 支持平台 | `aiocqhttp` |
 | 开源协议 | MIT |
